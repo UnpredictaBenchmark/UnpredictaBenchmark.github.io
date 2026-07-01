@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="UnpredictaBench tests whether LLMs can capture true underlying distributions — 448 problems evaluated with KS@N.">
+  <meta name="author" content="Amirhossein Abaskohi, Amirhossein Dabiriaghdam, et al.">
+  <meta name="theme-color" content="#001F5B">
+  <meta property="og:title" content="UnpredictaBench">
+  <meta property="og:description" content="An evaluation that tests the ability of LLMs to capture true underlying distributions.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/images/teaser.png">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <title>UnpredictaBench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="UnpredictaBench home">
+        <img src="assets/images/logo.png" alt="UnpredictaBench" class="site-logo site-logo-nav" width="248" height="103">
+      </a>
+      <div class="nav-actions">
+        <button class="theme-switch" id="theme-toggle" type="button" aria-label="Toggle color theme">
+          <span class="theme-switch-seg active" data-theme-value="light">Light</span>
+          <span class="theme-switch-seg" data-theme-value="dark">Dark</span>
+        </button>
+        <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#benchmark">Benchmark</a></li>
+        <li><a href="#metric">KS@N</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#leaderboard">Leaderboard</a></li>
+        <li><a href="#citation">Citation</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-bg">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-grid-pattern"></div>
+    </div>
+    <div class="container hero-layout">
+      <div class="hero-main">
+        <h1 class="hero-title hero-title-logo">
+          <img src="assets/images/logo.png" alt="UnpredictaBench" class="site-logo site-logo-hero" width="400" height="166">
+        </h1>
+        <p class="hero-subtitle">An evaluation that tests the ability of large language models to capture true underlying distributions</p>
+
+        <div class="authors">
+          <p class="author-list">
+            <span class="author-name">Amirhossein Abaskohi</span><sup>*1</sup>,
+            <span class="author-name">Amirhossein Dabiriaghdam</span><sup>*1</sup>,
+            <span class="author-name">Liang Luo</span><sup>2</sup>,
+            <span class="author-name">Ellie Dingqiao Wen</span><sup>2</sup>,
+            <span class="author-name">Lele Wang</span><sup>1</sup>,
+            <span class="author-name">Giuseppe Carenini</span><sup>1</sup>,
+            <span class="author-name">Peter West</span><sup>1</sup>
+          </p>
+          <p class="affiliations">
+            <sup>1</sup>University of British Columbia &nbsp;&nbsp;
+            <sup>2</sup>Independent Researcher
+          </p>
+          <p class="author-notes"><sup>*</sup>Equal contribution</p>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">448</span>
+            <span class="stat-label">Problems</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">23</span>
+            <span class="stat-label">Models</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100</span>
+            <span class="stat-label">Samples / task</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">40</span>
+            <span class="stat-label">Distributions</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">7</span>
+            <span class="stat-label">Task types</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">44.8K</span>
+            <span class="stat-label">Outputs / model</span>
+          </div>
+        </div>
+
+        <div class="hero-buttons">
+          <a href="https://arxiv.org/pdf/2606.06622" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM8 12h8v2H8v-2zm0 4h5v2H8v-2z"/></svg>
+            Paper
+          </a>
+          <a href="https://github.com/UnpredictaBench/UnpredictaBenchCode" class="btn btn-secondary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A10.02 10.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            Code
+          </a>
+          <a href="https://huggingface.co/datasets/UnpredictaBench/UnpredictaBench" class="btn btn-secondary" target="_blank" rel="noopener">
+            <img src="assets/images/huggingface_logo.png" alt="" width="18" height="18">
+            Dataset
+          </a>
+        </div>
+      </div>
+
+      <aside class="mini-leaderboard-card" id="mini-leaderboard">
+        <div class="mini-lb-header">
+          <h2 class="mini-lb-title">Top Models</h2>
+          <p class="mini-lb-subtitle">KS@100 overall</p>
+        </div>
+        <ol class="mini-lb-list" id="mini-lb-list">
+          <li class="mini-lb-skeleton"></li>
+          <li class="mini-lb-skeleton"></li>
+          <li class="mini-lb-skeleton"></li>
+          <li class="mini-lb-skeleton"></li>
+          <li class="mini-lb-skeleton"></li>
+        </ol>
+        <a href="#leaderboard" class="mini-lb-link">View full leaderboard &rarr;</a>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section class="section teaser-section">
+      <div class="container">
+        <figure class="figure figure-hero">
+          <img src="assets/images/teaser.png" alt="Most models fail to reproduce target distributions; real-world simulation requires calibrated stochastic outputs" loading="lazy">
+          <figcaption>
+            <strong>Figure 1.</strong> (a) Most models fail to reproduce target distributions, either lacking distributional understanding or collapsing to a narrow output range.
+            (b) Applications such as economic simulation and epidemiological modeling require LLMs to produce uncertain outcomes calibrated to the underlying process.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="abstract" class="section">
+      <div class="container container-narrow">
+        <h2 class="section-title">Abstract</h2>
+        <div class="abstract-text">
+          <p>
+            We introduce <strong>UnpredictaBench</strong>, an evaluation that tests the ability of LLMs to capture true
+            underlying distributions. Simulation requires samples calibrated to a target distribution, not merely varied
+            outputs&mdash;yet most models collapse toward a single plausible answer.
+          </p>
+          <p>
+            The benchmark comprises 448 problems across textual, code, multimodal, shuffling, and real-world scenarios,
+            scored with <strong>KS@N</strong> via the Kolmogorov-Smirnov test. At KS@100, no model exceeds 40%;
+            even simple distributional simulation remains an open challenge.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="benchmark" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Benchmark</h2>
+        <p class="section-lead">
+          Models must <em>sample from direct, single-output distributions</em>&mdash;not just recognize or describe them.
+          Each task is queried 100 times; outputs are compared to ground truth via KS@N.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/images/Unpredictabench_cropped.png" alt="UnpredictaBench data generation and evaluation pipeline" loading="lazy">
+          <figcaption><strong>Figure 2.</strong> Data generation from 40 Wikipedia distributions + 50 human-curated tasks; evaluation via repeated sampling.</figcaption>
+        </figure>
+
+        <h3 class="subsection-title">Task Examples</h3>
+        <div class="examples-grid">
+          <div class="example-card">
+            <span class="example-tag">Text · Explicit</span>
+            <p class="example-prompt">Generate a random sample from a Poisson distribution with rate parameter &lambda; = 18, representing the number of events observed in one fixed interval.</p>
+          </div>
+          <div class="example-card">
+            <span class="example-tag">Text · Implicit</span>
+            <p class="example-prompt">A quality-control engineer inspects 6 components, each independently failing with probabilities 0.04, 0.05, 0.03, 0.06, 0.04, and 0.05. What is one possible total number of failed components in a single inspection?</p>
+          </div>
+          <div class="example-card example-card-code">
+            <span class="example-tag">Code · Explicit</span>
+            <pre><code>import numpy as np
+a = 2.0; b = 2.5
+u = np.random.uniform(0.0, 1.0)
+sample = a * (b / a) ** u
+print(sample)</code></pre>
+            <p class="example-note">Predict one possible output of this program.</p>
+          </div>
+          <div class="example-card example-card-code">
+            <span class="example-tag">Code · Implicit</span>
+            <pre><code>import numpy as np
+rng = np.random.default_rng()
+x = rng.gamma(shape=0.6, scale=1.0)
+y = rng.gamma(shape=0.6, scale=1.0)
+outcome = x / (x + y)
+print(float(outcome))</code></pre>
+            <p class="example-note">The target distribution is implemented indirectly via transformations.</p>
+          </div>
+          <div class="example-card">
+            <span class="example-tag">Multimodal</span>
+            <p class="example-prompt">Generate one random sample from a 2-component mixture of exponential distributions: with probability 0.55, draw from Exponential(&lambda;=8.0); with probability 0.45, draw from Exponential(&lambda;=1.6).</p>
+          </div>
+          <div class="example-card">
+            <span class="example-tag">Shuffling</span>
+            <p class="example-prompt">Considering this list: <code>["first", "second", "third"]</code>, what is one possible uniform random shuffle? Respond with exactly one list only.</p>
+          </div>
+          <div class="example-card example-card-wide">
+            <span class="example-tag">Real-World</span>
+            <p class="example-prompt">Three temporary objects&mdash;A, B, and C&mdash;become unused and a manual cleanup is triggered. Only one object name is printed immediately after cleanup. <strong>Question:</strong> What is one possible output? Respond with exactly one word (A, B, or C).</p>
+          </div>
+        </div>
+
+        <div class="task-pills">
+          <span class="task-pill">Text <em>238</em></span>
+          <span class="task-pill">Code <em>160</em></span>
+          <span class="task-pill">Multimodal <em>80</em></span>
+          <span class="task-pill">Shuffling <em>20</em></span>
+          <span class="task-pill">Real-World <em>30</em></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="metric" class="section">
+      <div class="container">
+        <h2 class="section-title">KS@N Metric</h2>
+        <p class="section-lead">
+          <strong>KS@N</strong> is the fraction of problems where a model&rsquo;s <em>N</em> samples pass a Kolmogorov-Smirnov test
+          against ground truth. Larger <em>N</em> means harder evaluation; only samples are needed, not closed-form densities.
+        </p>
+        <div class="metric-chips">
+          <div class="metric-chip"><strong>KS@1 = 100%</strong> for all models</div>
+          <div class="metric-chip"><strong>KS@100</strong> is the standard metric</div>
+          <div class="metric-chip">Also reports <strong>JSD</strong> and <strong>WDZ</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">Results</h2>
+        <p class="section-lead">
+          No model surpasses 40% at KS@100. Code and shuffling are hardest; several frontier models collapse to 0% on shuffling.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/images/model_accuracy_overall.png" alt="KS@100 scores for all evaluated models grouped by model family" loading="lazy">
+          <figcaption><strong>Figure 3.</strong> KS@100 across 23 models. Nemotron-3 Super 120B leads at 35.43%.</figcaption>
+        </figure>
+
+        <div class="findings-grid findings-compact">
+          <div class="finding-card">
+            <h4>Scale isn&rsquo;t everything</h4>
+            <p>Qwen3.5-2B rivals models 10&times; larger; Claude Sonnet 4.6 scores only 4.7%.</p>
+          </div>
+          <div class="finding-card">
+            <h4>One answer &ne; a distribution</h4>
+            <p>Claude Sonnet 4.6: 97.7% KS@2 but 5.0% KS@100.</p>
+          </div>
+          <div class="finding-card">
+            <h4>Correlates with creativity</h4>
+            <p>Strong alignment with NoveltyBench and CREATE utility metrics.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/images/grid_distributions_1.png" alt="Qualitative comparison of model outputs vs ground-truth distributions" loading="lazy">
+          <figcaption><strong>Figure 4.</strong> Model samples vs. ground-truth distributions.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="leaderboard" class="section">
+      <div class="container">
+        <h2 class="section-title">Leaderboard</h2>
+        <p class="section-lead">Interactive results for all 23 models.</p>
+
+        <div id="leaderboard-full" class="leaderboard">
+          <div class="leaderboard-controls">
+            <div class="control-group control-search">
+              <label for="lb-search">Search</label>
+              <input type="search" id="lb-search" placeholder="Filter by model name…" autocomplete="off">
+            </div>
+            <div class="control-group">
+              <label for="lb-metric">Metric</label>
+              <select id="lb-metric">
+                <option value="ks" selected>KS@N</option>
+                <option value="jsd">JSD</option>
+                <option value="wdz">WDZ</option>
+              </select>
+            </div>
+            <div class="control-group" data-control="sample">
+              <label for="lb-sample">Sample size</label>
+              <select id="lb-sample"></select>
+            </div>
+            <div class="control-group" data-control="category">
+              <label for="lb-category">Category</label>
+              <select id="lb-category"></select>
+            </div>
+          </div>
+
+          <div class="leaderboard-meta">
+            <span id="lb-count"></span>
+            <span class="leaderboard-hint">Profile shows KS@N decay from N=1 &rarr; N=100</span>
+          </div>
+
+          <div class="leaderboard-table-wrap">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th data-sort="rank" class="col-rank">#</th>
+                  <th data-sort="name" class="col-model">Model</th>
+                  <th class="col-profile">KS@N Profile</th>
+                  <th data-sort="score" id="lb-score-header" class="col-score sort-active sort-desc">KS@100</th>
+                </tr>
+              </thead>
+              <tbody id="lb-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="citation" class="section section-alt">
+      <div class="container container-narrow">
+        <h2 class="section-title">Citation</h2>
+        <div class="bibtex-block">
+          <button class="copy-btn" id="copy-bibtex" aria-label="Copy BibTeX to clipboard">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            <span>Copy</span>
+          </button>
+          <pre id="bibtex"><code>@misc{abaskohi2026unpredictabench,
+  title={UnpredictaBench: A Benchmark for Evaluating Distributional Randomness in LLMs},
+  author={Amirhossein Abaskohi and Amirhossein Dabiriaghdam and Liang Luo and Ellie Dingqiao Wen and Lele Wang and Giuseppe Carenini and Peter West},
+  year={2026},
+  eprint={2606.06622},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2606.06622}
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-brand footer-brand-lockup">
+        <img src="assets/images/logo-mark.png" alt="" class="site-logo-mark" width="36" height="36" aria-hidden="true">
+        <span class="footer-brand-text"><span class="logo-unpredicta">Unpredicta</span><span class="logo-bench">Bench</span></span>
+      </p>
+      <p class="footer-affil">UnpredictaBench Research Team &middot; &copy; 2026</p>
+      <p class="footer-links">
+        <a href="https://arxiv.org/abs/2606.06622" target="_blank" rel="noopener">Paper</a>
+        <a href="https://github.com/UnpredictaBench/UnpredictaBenchCode" target="_blank" rel="noopener">Code</a>
+        <a href="https://huggingface.co/datasets/UnpredictaBench/UnpredictaBench" target="_blank" rel="noopener">Dataset</a>
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/leaderboard.js"></script>
+</body>
+</html>

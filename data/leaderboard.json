@@ -1,0 +1,301 @@
+{
+  "metrics": {
+    "ks": { "label": "KS@N", "direction": "higher", "unit": "%", "max": 100 },
+    "jsd": { "label": "JSD", "direction": "lower", "unit": "", "max": 1 },
+    "wdz": { "label": "WDZ", "direction": "lower", "unit": "", "max": 60 }
+  },
+  "sampleSizes": [1, 2, 5, 10, 20, 50, 100],
+  "categories": [
+    { "id": "overall", "label": "Overall" },
+    { "id": "code", "label": "Code" },
+    { "id": "text", "label": "Text" },
+    { "id": "realworld", "label": "Real-World" },
+    { "id": "shuffling", "label": "Shuffling" }
+  ],
+  "families": [
+    "NVIDIA", "OpenAI", "DeepSeek", "Meta", "Alibaba", "Mistral AI", "Anthropic", "AI2", "Microsoft", "xAI", "Inception"
+  ],
+  "models": [
+    {
+      "id": "nemotron-3-super-120b",
+      "name": "Nemotron-3 Super 120B",
+      "family": "NVIDIA",
+      "open": true,
+      "ks": { "1": 100, "2": 94.97, "5": 97.74, "10": 91.96, "20": 82.66, "50": 56.28, "100": 35.43 },
+      "categories": {
+        "code": { "ks100": 28.13, "jsd": 0.30, "wdz": 5.89 },
+        "text": { "ks100": 40.34, "jsd": 0.48, "wdz": 7.44 },
+        "realworld": { "ks100": 3.33, "jsd": 0.16, "wdz": 35.36 },
+        "shuffling": { "ks100": 21.05, "jsd": 0.15, "wdz": 10.13 }
+      }
+    },
+    {
+      "id": "gpt-4o",
+      "name": "GPT-4o",
+      "family": "OpenAI",
+      "open": false,
+      "ks": { "1": 100, "2": 96.98, "5": 96.23, "10": 91.71, "20": 78.39, "50": 45.73, "100": 26.13 },
+      "categories": {
+        "code": { "ks100": 21.25, "jsd": 0.18, "wdz": 11.92 },
+        "text": { "ks100": 29.41, "jsd": 0.33, "wdz": 8.80 },
+        "realworld": { "ks100": 6.67, "jsd": 0.22, "wdz": 17.60 },
+        "shuffling": { "ks100": 5.26, "jsd": 0.19, "wdz": 12.27 }
+      }
+    },
+    {
+      "id": "gpt-5.4",
+      "name": "GPT-5.4",
+      "family": "OpenAI",
+      "open": false,
+      "ks": { "1": 100, "2": 98.49, "5": 98.49, "10": 91.46, "20": 67.84, "50": 33.92, "100": 16.58 },
+      "categories": {
+        "code": { "ks100": 25.63, "jsd": 0.19, "wdz": 9.03 },
+        "text": { "ks100": 10.50, "jsd": 0.30, "wdz": 10.58 },
+        "realworld": { "ks100": 6.67, "jsd": 0.25, "wdz": 19.00 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.26, "wdz": 16.81 }
+      }
+    },
+    {
+      "id": "nemotron-3-nano-30b",
+      "name": "Nemotron-3 Nano 30B",
+      "family": "NVIDIA",
+      "open": true,
+      "ks": { "1": 100, "2": 91.21, "5": 95.48, "10": 85.68, "20": 72.61, "50": 39.45, "100": 19.35 },
+      "categories": {
+        "code": { "ks100": 20.63, "jsd": 0.29, "wdz": 11.11 },
+        "text": { "ks100": 18.49, "jsd": 0.24, "wdz": 10.61 },
+        "realworld": { "ks100": 33.33, "jsd": 0.19, "wdz": 12.60 },
+        "shuffling": { "ks100": 31.58, "jsd": 0.12, "wdz": 8.11 }
+      }
+    },
+    {
+      "id": "deepseek-v3.2",
+      "name": "DeepSeek V3.2",
+      "family": "DeepSeek",
+      "open": true,
+      "ks": { "1": 100, "2": 93.47, "5": 94.22, "10": 84.42, "20": 67.84, "50": 36.18, "100": 19.85 },
+      "categories": {
+        "code": { "ks100": 28.13, "jsd": 0.18, "wdz": 12.28 },
+        "text": { "ks100": 14.29, "jsd": 0.26, "wdz": 13.05 },
+        "realworld": { "ks100": 36.67, "jsd": 0.15, "wdz": 13.18 },
+        "shuffling": { "ks100": 36.84, "jsd": 0.13, "wdz": 8.58 }
+      }
+    },
+    {
+      "id": "ministral-3b-base",
+      "name": "Ministral-3 3B (Base)",
+      "family": "Mistral AI",
+      "open": true,
+      "ks": { "1": 100, "2": 83.42, "5": 92.71, "10": 79.90, "20": 61.81, "50": 32.41, "100": 17.84 }
+    },
+    {
+      "id": "qwen3.5-2b-base",
+      "name": "Qwen3.5-2B (Base)",
+      "family": "Alibaba",
+      "open": true,
+      "ks": { "1": 100, "2": 87.69, "5": 91.21, "10": 80.40, "20": 59.80, "50": 35.43, "100": 16.58 }
+    },
+    {
+      "id": "llama-3.1-70b",
+      "name": "Llama 3.1 70B Instruct",
+      "family": "Meta",
+      "open": true,
+      "ks": { "1": 100, "2": 93.97, "5": 93.22, "10": 84.67, "20": 65.33, "50": 29.40, "100": 15.08 },
+      "categories": {
+        "code": { "ks100": 23.13, "jsd": 0.21, "wdz": 15.01 },
+        "text": { "ks100": 9.66, "jsd": 0.26, "wdz": 12.96 },
+        "realworld": { "ks100": 33.33, "jsd": 0.15, "wdz": 12.23 },
+        "shuffling": { "ks100": 21.05, "jsd": 0.15, "wdz": 10.21 }
+      }
+    },
+    {
+      "id": "ministral-3b-instruct",
+      "name": "Ministral-3 3B Instruct",
+      "family": "Mistral AI",
+      "open": true,
+      "ks": { "1": 100, "2": 85.43, "5": 90.20, "10": 77.14, "20": 54.77, "50": 30.90, "100": 16.58 },
+      "categories": {
+        "code": { "ks100": 21.25, "jsd": 0.18, "wdz": 1.61 },
+        "text": { "ks100": 17.23, "jsd": 0.37, "wdz": 12.11 },
+        "realworld": { "ks100": 6.67, "jsd": 0.13, "wdz": 36.14 },
+        "shuffling": { "ks100": 5.26, "jsd": 0.15, "wdz": 9.67 }
+      }
+    },
+    {
+      "id": "qwen3.5-2b",
+      "name": "Qwen3.5-2B",
+      "family": "Alibaba",
+      "open": true,
+      "ks": { "1": 100, "2": 85.93, "5": 88.69, "10": 78.14, "20": 56.03, "50": 31.41, "100": 13.32 },
+      "categories": {
+        "code": { "ks100": 14.38, "jsd": 0.35, "wdz": 11.30 },
+        "text": { "ks100": 12.61, "jsd": 0.29, "wdz": 10.87 },
+        "realworld": { "ks100": 31.03, "jsd": 0.17, "wdz": 12.32 },
+        "shuffling": { "ks100": 36.84, "jsd": 0.11, "wdz": 3.18 }
+      }
+    },
+    {
+      "id": "olmo-3-7b",
+      "name": "OLMo-3 7B Instruct",
+      "family": "AI2",
+      "open": true,
+      "ks": { "1": 100, "2": 88.19, "5": 83.92, "10": 71.11, "20": 46.98, "50": 18.34, "100": 6.28 },
+      "categories": {
+        "code": { "ks100": 7.50, "jsd": 0.29, "wdz": 20.74 },
+        "text": { "ks100": 5.46, "jsd": 0.46, "wdz": 34.93 },
+        "realworld": { "ks100": 3.33, "jsd": 0.26, "wdz": 59.16 },
+        "shuffling": { "ks100": 36.84, "jsd": 0.13, "wdz": 7.64 }
+      }
+    },
+    {
+      "id": "gpt-4o-mini",
+      "name": "GPT-4o Mini",
+      "family": "OpenAI",
+      "open": false,
+      "ks": { "1": 100, "2": 93.22, "5": 90.20, "10": 80.15, "20": 56.28, "50": 21.86, "100": 10.05 },
+      "categories": {
+        "code": { "ks100": 9.38, "jsd": 0.26, "wdz": 16.49 },
+        "text": { "ks100": 10.50, "jsd": 0.25, "wdz": 12.75 },
+        "realworld": { "ks100": 10.00, "jsd": 0.26, "wdz": 17.88 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.22, "wdz": 14.47 }
+      }
+    },
+    {
+      "id": "llama-3.2-1b",
+      "name": "Llama 3.2 1B",
+      "family": "Meta",
+      "open": true,
+      "ks": { "1": 100, "2": 79.40, "5": 87.69, "10": 74.87, "20": 52.01, "50": 23.12, "100": 11.31 }
+    },
+    {
+      "id": "mercury-2",
+      "name": "Mercury-2",
+      "family": "Inception",
+      "open": false,
+      "ks": { "1": 100, "2": 90.95, "5": 91.96, "10": 78.14, "20": 56.78, "50": 20.60, "100": 8.54 },
+      "categories": {
+        "code": { "ks100": 10.63, "jsd": 0.31, "wdz": 12.60 },
+        "text": { "ks100": 7.14, "jsd": 0.27, "wdz": 10.12 },
+        "realworld": { "ks100": 13.33, "jsd": 0.20, "wdz": 13.97 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.20, "wdz": 12.91 }
+      }
+    },
+    {
+      "id": "qwen3-32b",
+      "name": "Qwen3-32B",
+      "family": "Alibaba",
+      "open": true,
+      "ks": { "1": 100, "2": 94.97, "5": 93.97, "10": 81.16, "20": 55.28, "50": 18.59, "100": 8.04 },
+      "categories": {
+        "code": { "ks100": 11.88, "jsd": 0.24, "wdz": 14.30 },
+        "text": { "ks100": 5.46, "jsd": 0.27, "wdz": 12.81 },
+        "realworld": { "ks100": 16.67, "jsd": 0.23, "wdz": 17.33 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.19, "wdz": 13.21 }
+      }
+    },
+    {
+      "id": "grok-4.1-fast",
+      "name": "Grok-4.1 Fast",
+      "family": "xAI",
+      "open": false,
+      "ks": { "1": 100, "2": 93.22, "5": 88.94, "10": 69.85, "20": 34.92, "50": 8.79, "100": 6.03 },
+      "categories": {
+        "code": { "ks100": 6.88, "jsd": 0.33, "wdz": 16.37 },
+        "text": { "ks100": 5.46, "jsd": 0.47, "wdz": 15.26 },
+        "realworld": { "ks100": 3.33, "jsd": 0.21, "wdz": 19.48 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.19, "wdz": 12.69 }
+      }
+    },
+    {
+      "id": "claude-sonnet-4.6",
+      "name": "Claude Sonnet 4.6",
+      "family": "Anthropic",
+      "open": false,
+      "ks": { "1": 100, "2": 97.73, "5": 95.47, "10": 78.59, "20": 34.76, "50": 9.32, "100": 5.04 },
+      "categories": {
+        "code": { "ks100": 5.03, "jsd": 0.34, "wdz": 13.27 },
+        "text": { "ks100": 5.04, "jsd": 0.25, "wdz": 13.40 },
+        "realworld": { "ks100": 3.33, "jsd": 0.31, "wdz": 19.61 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.22, "wdz": 18.17 }
+      }
+    },
+    {
+      "id": "mistral-large",
+      "name": "Mistral Large",
+      "family": "Mistral AI",
+      "open": false,
+      "ks": { "1": 100, "2": 93.97, "5": 90.70, "10": 74.87, "20": 45.48, "50": 10.05, "100": 4.52 },
+      "categories": {
+        "code": { "ks100": 3.75, "jsd": 0.32, "wdz": 17.24 },
+        "text": { "ks100": 5.04, "jsd": 0.29, "wdz": 14.75 },
+        "realworld": { "ks100": 10.00, "jsd": 0.22, "wdz": 17.91 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.27, "wdz": 16.15 }
+      }
+    },
+    {
+      "id": "llama-3.1-8b",
+      "name": "Llama 3.1 8B Instruct",
+      "family": "Meta",
+      "open": true,
+      "ks": { "1": 100, "2": 78.64, "5": 79.65, "10": 66.33, "20": 41.46, "50": 14.82, "100": 4.27 },
+      "categories": {
+        "code": { "ks100": 3.75, "jsd": 0.34, "wdz": 22.70 },
+        "text": { "ks100": 4.62, "jsd": 0.29, "wdz": 21.88 },
+        "realworld": { "ks100": 30.00, "jsd": 0.17, "wdz": 14.52 },
+        "shuffling": { "ks100": 15.79, "jsd": 0.15, "wdz": 9.49 }
+      }
+    },
+    {
+      "id": "qwen-3.5-397b",
+      "name": "Qwen-3.5-397B",
+      "family": "Alibaba",
+      "open": true,
+      "ks": { "1": 100, "2": 94.47, "5": 86.93, "10": 56.03, "20": 17.09, "50": 4.77, "100": 3.27 },
+      "categories": {
+        "code": { "ks100": 3.80, "jsd": 0.51, "wdz": 17.50 },
+        "text": { "ks100": 2.94, "jsd": 0.45, "wdz": 15.21 },
+        "realworld": { "ks100": 3.33, "jsd": 0.34, "wdz": 22.44 },
+        "shuffling": { "ks100": 5.26, "jsd": 0.18, "wdz": 17.23 }
+      }
+    },
+    {
+      "id": "qwen-3.5-35b",
+      "name": "Qwen-3.5-35B",
+      "family": "Alibaba",
+      "open": true,
+      "ks": { "1": 100, "2": 88.69, "5": 78.14, "10": 49.50, "20": 12.31, "50": 4.27, "100": 3.27 },
+      "categories": {
+        "code": { "ks100": 3.75, "jsd": 0.52, "wdz": 19.35 },
+        "text": { "ks100": 2.94, "jsd": 0.55, "wdz": 16.62 },
+        "realworld": { "ks100": 3.57, "jsd": 0.43, "wdz": 25.46 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.31, "wdz": 18.11 }
+      }
+    },
+    {
+      "id": "llama-3.2-1b-instruct",
+      "name": "Llama 3.2 1B Instruct",
+      "family": "Meta",
+      "open": true,
+      "ks": { "1": 100, "2": 47.49, "5": 62.56, "10": 33.92, "20": 16.58, "50": 5.53, "100": 2.76 },
+      "categories": {
+        "code": { "ks100": 10.00, "jsd": 0.57, "wdz": 14.94 },
+        "text": { "ks100": 4.20, "jsd": 0.52, "wdz": 29.82 },
+        "realworld": { "ks100": 59.09, "jsd": 0.20, "wdz": 11.35 },
+        "shuffling": { "ks100": 36.84, "jsd": 0.12, "wdz": 6.26 }
+      }
+    },
+    {
+      "id": "phi-3.5-mini",
+      "name": "Phi-3.5 Mini Instruct",
+      "family": "Microsoft",
+      "open": true,
+      "ks": { "1": 100, "2": 88.44, "5": 80.15, "10": 62.56, "20": 29.15, "50": 7.54, "100": 2.51 },
+      "categories": {
+        "code": { "ks100": 1.88, "jsd": 0.35, "wdz": 20.02 },
+        "text": { "ks100": 2.94, "jsd": 0.52, "wdz": 17.44 },
+        "realworld": { "ks100": 10.00, "jsd": 0.29, "wdz": 18.93 },
+        "shuffling": { "ks100": 0.00, "jsd": 0.19, "wdz": 13.21 }
+      }
+    }
+  ]
+}
