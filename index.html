@@ -167,7 +167,7 @@
           </p>
           <p>
             The benchmark comprises 448 problems across textual, code, multimodal, shuffling, and real-world scenarios,
-            scored with <strong>KS@N</strong> via the Kolmogorov-Smirnov test. At KS@100, no model exceeds 40%;
+            scored with <strong>KS@N</strong> via the Kolmogorov-Smirnov test. At KS@100 on the full benchmark, no model exceeds 40%;
             even simple distributional simulation remains an open challenge.
           </p>
         </div>
@@ -248,9 +248,9 @@ print(float(outcome))</code></pre>
           against ground truth. Larger <em>N</em> means harder evaluation; only samples are needed, not closed-form densities.
         </p>
         <div class="metric-chips">
-          <div class="metric-chip"><strong>KS@1 = 100%</strong> for all models</div>
+          <div class="metric-chip"><strong>KS@N</strong> &mdash; higher is better</div>
           <div class="metric-chip"><strong>KS@100</strong> is the standard metric</div>
-          <div class="metric-chip">Also reports <strong>JSD</strong> and <strong>WDZ</strong></div>
+          <div class="metric-chip"><strong>JSD</strong> &amp; <strong>WDZ</strong> &mdash; lower is better</div>
         </div>
       </div>
     </section>
@@ -259,22 +259,22 @@ print(float(outcome))</code></pre>
       <div class="container">
         <h2 class="section-title">Results</h2>
         <p class="section-lead">
-          No model surpasses 40% at KS@100. Code and shuffling are hardest; several frontier models collapse to 0% on shuffling.
+          No model surpasses 40% at KS@100 on the full benchmark. Nemotron-3 Super leads at 32.64%, followed by GPT-4o at 23.90% and DeepSeek V3.2 at 21.73%. Performance generally declines as <em>N</em> increases, with sharper drops at larger sample sizes. Code and shuffling are hardest; several frontier models collapse to 0% on shuffling.
         </p>
 
         <figure class="figure">
           <img src="assets/images/model_accuracy_overall.png" alt="KS@100 scores for all evaluated models grouped by model family" loading="lazy">
-          <figcaption><strong>Figure 3.</strong> KS@100 across 23 models. Nemotron-3 Super 120B leads at 35.43%.</figcaption>
+          <figcaption><strong>Figure 3.</strong> KS@100 across 23 models. Nemotron-3 Super 120B leads at 32.64%.</figcaption>
         </figure>
 
         <div class="findings-grid findings-compact">
           <div class="finding-card">
             <h4>Scale isn&rsquo;t everything</h4>
-            <p>Qwen3.5-2B rivals models 10&times; larger; Claude Sonnet 4.6 scores only 4.7%.</p>
+            <p>Qwen3.5-2B reaches 17.67%, rivaling much larger models; Claude Sonnet 4.6 scores only 4.70%.</p>
           </div>
           <div class="finding-card">
             <h4>One answer &ne; a distribution</h4>
-            <p>Claude Sonnet 4.6: 97.7% KS@2 but 5.0% KS@100.</p>
+            <p>Claude Sonnet 4.6: 97.76% at KS@2 but only 4.70% at KS@100.</p>
           </div>
           <div class="finding-card">
             <h4>Correlates with creativity</h4>
@@ -292,7 +292,7 @@ print(float(outcome))</code></pre>
     <section id="leaderboard" class="section">
       <div class="container">
         <h2 class="section-title">Leaderboard</h2>
-        <p class="section-lead">Interactive results for all 23 models.</p>
+        <p class="section-lead">Interactive results for all 23 models. Instruct variants report the full benchmark; Base variants report the Text+Code subset.</p>
 
         <div id="leaderboard-full" class="leaderboard">
           <div class="leaderboard-controls">
@@ -303,9 +303,9 @@ print(float(outcome))</code></pre>
             <div class="control-group">
               <label for="lb-metric">Metric</label>
               <select id="lb-metric">
-                <option value="ks" selected>KS@N</option>
-                <option value="jsd">JSD</option>
-                <option value="wdz">WDZ</option>
+                <option value="ks" selected>KS@N (↑ higher)</option>
+                <option value="jsd">JSD (↓ lower)</option>
+                <option value="wdz">WDZ (↓ lower)</option>
               </select>
             </div>
             <div class="control-group" data-control="sample">
@@ -320,7 +320,7 @@ print(float(outcome))</code></pre>
 
           <div class="leaderboard-meta">
             <span id="lb-count"></span>
-            <span class="leaderboard-hint">Profile shows KS@N decay from N=1 &rarr; N=100</span>
+            <span class="leaderboard-hint">Profile shows KS@N from N=1 &rarr; N=100</span>
           </div>
 
           <div class="leaderboard-table-wrap">
@@ -329,7 +329,7 @@ print(float(outcome))</code></pre>
                 <tr>
                   <th data-sort="rank" class="col-rank">#</th>
                   <th data-sort="name" class="col-model">Model</th>
-                  <th class="col-profile">KS@N Profile</th>
+                  <th class="col-profile" id="lb-profile-header">KS@N Profile</th>
                   <th data-sort="score" id="lb-score-header" class="col-score sort-active sort-desc">KS@100</th>
                 </tr>
               </thead>

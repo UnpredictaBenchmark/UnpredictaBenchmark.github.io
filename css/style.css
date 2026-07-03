@@ -681,11 +681,15 @@ img {
   border: 1px solid var(--border);
 }
 
-.example-card code {
+.example-card pre code {
   font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
   font-size: 0.8rem;
   line-height: 1.55;
   color: var(--code-text);
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-weight: 400;
 }
 
 .example-note {
@@ -967,6 +971,31 @@ img {
   box-shadow: 0 0 0 3px var(--teal-glow);
 }
 
+.control-group.control-inactive {
+  opacity: 0.5;
+}
+
+.control-group.control-inactive label {
+  color: var(--text-muted);
+}
+
+.control-group.control-inactive select {
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  border-color: var(--border-light);
+}
+
+.control-group.control-inactive select:focus {
+  border-color: var(--border-light);
+  box-shadow: none;
+}
+
+.cat-bars-subset .cat-bar-item:nth-child(1) .cat-bar-fill,
+.cat-bars-subset .cat-bar-item:nth-child(2) .cat-bar-fill {
+  opacity: 0.85;
+}
+
 .leaderboard-meta {
   display: flex;
   justify-content: space-between;
@@ -1046,6 +1075,21 @@ img {
   min-width: 200px;
 }
 
+.leaderboard-table th.col-profile {
+  line-height: 1.35;
+  vertical-align: bottom;
+}
+
+.col-profile-axes {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  text-transform: none;
+}
+
 .leaderboard-table th.col-score,
 .leaderboard-table td.lb-score {
   width: 120px;
@@ -1086,6 +1130,40 @@ img {
   gap: 8px;
   font-weight: 700;
   color: var(--heading);
+  flex-wrap: wrap;
+}
+
+.lb-variant-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
+.lb-variant-badge-base {
+  color: var(--text-muted);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+}
+
+.lb-scope-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  background: var(--surface-alt);
+  border: 1px dashed var(--border);
+}
+
+.score-value:empty,
+.lb-score .score-value {
+  min-width: 3ch;
 }
 
 .model-dot {
@@ -1188,6 +1266,15 @@ img {
 .score-value {
   font-weight: 800;
   font-size: 0.95rem;
+}
+
+.lb-score-missing .score-value {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.lb-score-missing .score-meter {
+  opacity: 0;
 }
 
 .score-meter {

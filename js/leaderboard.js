@@ -45,10 +45,26 @@ function getCategoryMetricValues(model, metricKey) {
     .filter(v => v !== null && v !== undefined);
 }
 
+function isSubsetOnlyModel(model) {
+  return model.evalScope === 'text-code';
+}
+
 function getScore(model) {
+  const subsetOnly = isSubsetOnlyModel(model);
+
+  if (subsetOnly && state.category === 'overall') {
+    return null;
+  }
+
   if (state.metric === 'ks') {
     if (state.category === 'overall') {
       return getKsScore(model, state.sampleSize);
+    }
+    if (subsetOnly && (state.category === 'code' || state.category === 'text')) {
+      return getKsScore(model, 100);
+    }
+    if (subsetOnly && (state.category === 'realworld' || state.category === 'shuffling')) {
+      return null;
     }
     return model.categories?.[state.category]?.ks100 ?? null;
   }
@@ -57,17 +73,34 @@ function getScore(model) {
     if (!vals.length) return null;
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   }
+  if (subsetOnly && (state.category === 'code' || state.category === 'text')) {
+    return model.subsetMetrics?.[state.metric] ?? null;
+  }
+  if (subsetOnly && (state.category === 'realworld' || state.category === 'shuffling')) {
+    return null;
+  }
   if (!model.categories?.[state.category]) return null;
   return model.categories[state.category][state.metric] ?? null;
 }
 
-function getSortLabel() {
+function getDirectionArrow(direction) {
+  return direction === 'higher' ? '↑' : '↓';
+}
+
+function getDirectionLabel(direction) {
+  return direction === 'higher' ? 'higher is better' : 'lower is better';
+}
+
+function getSortLabel(data) {
+  const meta = data.metrics[state.metric];
+  const dir = getDirectionArrow(meta.direction);
+
   if (state.metric === 'ks') {
-    if (state.category === 'overall') return `KS@${state.sampleSize}`;
-    return `KS@100 (${capitalize(state.category)})`;
+    if (state.category === 'overall') return `KS@${state.sampleSize} ${dir}`;
+    return `KS@100 (${capitalize(state.category)}) ${dir}`;
   }
-  if (state.category === 'overall') return `${state.metric.toUpperCase()} (avg)`;
-  return `${state.metric.toUpperCase()} (${capitalize(state.category)})`;
+  if (state.category === 'overall') return `${state.metric.toUpperCase()} (avg) ${dir}`;
+  return `${state.metric.toUpperCase()} (${capitalize(state.category)}) ${dir}`;
 }
 
 function capitalize(s) {
@@ -77,9 +110,14 @@ function capitalize(s) {
 function filterModels(data) {
   return data.models.filter(m => {
     if (state.search && !m.name.toLowerCase().includes(state.search.toLowerCase())) return false;
-    if (getScore(m) === null && state.category !== 'overall') return false;
     return true;
   });
+}
+
+function variantSortKey(model) {
+  if (!model.variantGroup) return '9';
+  const order = model.variant === 'instruct' ? '0' : model.variant === 'base' ? '1' : '2';
+  return `${model.variantGroup}:${order}`;
 }
 
 function sortModels(models, data) {
@@ -87,25 +125,32 @@ function sortModels(models, data) {
   const metricDir = data.metrics[state.metric].direction;
 
   return [...models].sort((a, b) => {
-    if (state.sortKey === 'name') return a.name.localeCompare(b.name) * dir;
+    const tiebreak = () => variantSortKey(a).localeCompare(variantSortKey(b)) || a.name.localeCompare(b.name);
+
+    if (state.sortKey === 'name') {
+      const byName = a.name.localeCompare(b.name) * dir;
+      return byName || tiebreak();
+    }
     if (state.sortKey === 'rank') {
       const av = getScore(a);
       const bv = getScore(b);
-      if (av === null && bv === null) return 0;
+      if (av === null && bv === null) return tiebreak();
       if (av === null) return 1;
       if (bv === null) return -1;
       const scoreDir = data.metrics[state.metric].direction === 'higher' ? -1 : 1;
-      return (av - bv) * scoreDir;
+      const byScore = (av - bv) * scoreDir;
+      return byScore || tiebreak();
     }
 
     const av = getScore(a);
     const bv = getScore(b);
-    if (av === null && bv === null) return a.name.localeCompare(b.name);
+    if (av === null && bv === null) return tiebreak();
     if (av === null) return 1;
     if (bv === null) return -1;
     const diff = av - bv;
     const scoreDir = metricDir === 'higher' ? -1 : 1;
-    return diff * dir * scoreDir;
+    const byScore = diff * dir * scoreDir;
+    return byScore || tiebreak();
   });
 }
 
@@ -162,7 +207,8 @@ function renderKsProfile(model, data) {
   const areaPoints = `${pad.l},${pad.t + innerH} ${linePoints} ${pad.l + innerW},${pad.t + innerH}`;
   const last = coords[coords.length - 1];
 
-  return `<div class="ks-profile" title="KS@N decay: ${values[0].toFixed(0)}% at N=1 → ${values[values.length - 1].toFixed(1)}% at N=100">
+  const scopeNote = model.evalScopeLabel ? ` (${model.evalScopeLabel})` : '';
+  return `<div class="ks-profile" title="KS@N${scopeNote}: ${values[0].toFixed(0)}% at N=1 → ${values[values.length - 1].toFixed(1)}% at N=100">
     <svg viewBox="0 0 ${w} ${h}" class="ks-profile-svg" aria-hidden="true">
       <defs>
         <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
@@ -180,46 +226,111 @@ function renderKsProfile(model, data) {
   </div>`;
 }
 
-function renderCategoryBars(model) {
-  if (!model.categories) return '<span class="lb-no-profile">—</span>';
+function isSubsetAggregateScore(model) {
+  return (
+    isSubsetOnlyModel(model)
+    && state.category !== 'overall'
+    && (state.category === 'code' || state.category === 'text')
+    && model.subsetMetrics?.[state.metric] !== undefined
+  );
+}
 
+function getScoreTitle(model, score) {
+  if (score === null) return '';
+  if (isSubsetAggregateScore(model)) {
+    return 'Text+Code subset aggregate';
+  }
+  return '';
+}
+
+function getCategoryBarValues(model) {
   const metric = state.metric === 'ks' ? 'ks100' : state.metric;
-  const values = CATEGORY_KEYS.map(k => model.categories[k]?.[metric] ?? null);
+
+  if (model.categories) {
+    return CATEGORY_KEYS.map(k => model.categories[k]?.[metric] ?? null);
+  }
+
+  if (!isSubsetOnlyModel(model)) {
+    return CATEGORY_KEYS.map(() => null);
+  }
+
+  const aggregate = state.metric === 'ks'
+    ? model.ks?.['100'] ?? null
+    : model.subsetMetrics?.[state.metric] ?? null;
+
+  if (aggregate === null) {
+    return CATEGORY_KEYS.map(() => null);
+  }
+
+  return [aggregate, aggregate, null, null];
+}
+
+function formatCategoryBarValue(v) {
+  return state.metric === 'ks' ? `${v.toFixed(1)}%` : v.toFixed(2);
+}
+
+function renderCategoryBars(model, data) {
+  const values = getCategoryBarValues(model);
   if (values.every(v => v === null)) return '<span class="lb-no-profile">—</span>';
 
   const isLowerBetter = state.metric !== 'ks';
-  const maxVal = isLowerBetter
-    ? Math.max(...values.filter(v => v !== null), 0.01)
-    : 100;
+  const subsetModel = isSubsetOnlyModel(model);
+  const scaleMax = isLowerBetter ? data.metrics[state.metric].max : 100;
 
   const bars = values.map((v, i) => {
-    if (v === null) return `<div class="cat-bar-item"><span class="cat-bar-label">${CATEGORY_SHORT[i]}</span><div class="cat-bar-track"></div></div>`;
-    const pct = isLowerBetter ? Math.min((1 - v / maxVal) * 100, 100) : Math.min(v, 100);
-    return `<div class="cat-bar-item" title="${CATEGORY_SHORT[i]}: ${state.metric === 'ks' ? v.toFixed(1) + '%' : v.toFixed(2)}">
+    if (v === null) {
+      return `<div class="cat-bar-item"><span class="cat-bar-label">${CATEGORY_SHORT[i]}</span><div class="cat-bar-track"></div></div>`;
+    }
+    const pct = isLowerBetter
+      ? Math.max(0, Math.min((1 - v / scaleMax) * 100, 100))
+      : Math.min((v / scaleMax) * 100, 100);
+    const subsetNote = subsetModel && i < 2 ? ' · Text+Code subset' : '';
+    return `<div class="cat-bar-item" title="${CATEGORY_SHORT[i]}: ${formatCategoryBarValue(v)}${subsetNote}">
       <span class="cat-bar-label">${CATEGORY_SHORT[i]}</span>
       <div class="cat-bar-track"><span class="cat-bar-fill" style="width:${pct}%"></span></div>
     </div>`;
   }).join('');
 
-  return `<div class="cat-bars">${bars}</div>`;
+  return `<div class="cat-bars${subsetModel ? ' cat-bars-subset' : ''}">${bars}</div>`;
 }
 
 function renderProfile(model, data) {
-  if (state.metric === 'ks' && state.category === 'overall') {
+  if (isSubsetOnlyModel(model) && state.category === 'overall') {
+    return '<span class="lb-no-profile">—</span>';
+  }
+  if (state.metric === 'ks') {
     return renderKsProfile(model, data);
   }
-  return renderCategoryBars(model);
+  return renderCategoryBars(model, data);
 }
 
-function updateProfileHint(root) {
+function updateProfileHeader(root, data) {
+  const header = root.querySelector('#lb-profile-header');
+  if (!header) return;
+  const meta = data.metrics[state.metric];
+  const dir = getDirectionLabel(meta.direction);
+
+  if (state.metric === 'ks') {
+    header.innerHTML = `KS@N Profile <span class="col-profile-axes">Y: 0%&ndash;100% &middot; X: N=1&rarr;100 &middot; ${dir}</span>`;
+  } else {
+    header.innerHTML = `Per-category breakdown <span class="col-profile-axes">${dir} &middot; longer bar = better</span>`;
+  }
+}
+
+function updateProfileHint(root, data) {
   const hint = root.querySelector('.leaderboard-hint');
   if (!hint) return;
+  const meta = data.metrics[state.metric];
+  const dir = getDirectionLabel(meta.direction);
+
   if (state.metric === 'ks' && state.category === 'overall') {
-    hint.textContent = 'Profile: KS@N decay from N=1 → N=100';
+    hint.textContent = `KS@N: ${dir} · Profile from N=1 → N=100 · Y-axis 0%–100%`;
+  } else if (state.metric === 'ks' && state.category !== 'overall') {
+    hint.textContent = `KS@N: ${dir} · Profile shows full curve · Score column shows KS@100 for selected category`;
   } else if (state.metric !== 'ks' && state.category === 'overall') {
-    hint.textContent = 'Profile: per-category breakdown · Score column shows average';
-  } else {
-    hint.textContent = 'Profile: per-category breakdown (Code · Text · RW · Shuf)';
+    hint.textContent = `${meta.label}: ${dir} · Profile bars use fixed scale · Score column shows category average`;
+  } else if (state.metric !== 'ks') {
+    hint.textContent = `${meta.label}: ${dir} · Base models: Code/Text bars are Text+Code subset`;
   }
 }
 
@@ -228,7 +339,7 @@ function renderMiniLeaderboard(data) {
   if (!list) return;
 
   const top = [...data.models]
-    .filter(m => getKsScore(m, 100) !== null)
+    .filter(m => getKsScore(m, 100) !== null && !isSubsetOnlyModel(m))
     .sort((a, b) => getKsScore(b, 100) - getKsScore(a, 100))
     .slice(0, MINI_TOP_N);
 
@@ -293,8 +404,14 @@ function renderControls(root, data) {
 function updateControlVisibility(controls) {
   const sampleWrap = controls.querySelector('[data-control="sample"]');
   const categoryWrap = controls.querySelector('[data-control="category"]');
+  const sampleSelect = controls.querySelector('#lb-sample');
   const isKs = state.metric === 'ks';
-  sampleWrap.hidden = !isKs || state.category !== 'overall';
+  const sampleActive = isKs && state.category === 'overall';
+
+  sampleWrap.hidden = false;
+  sampleWrap.classList.toggle('control-inactive', !sampleActive);
+  if (sampleSelect) sampleSelect.disabled = !sampleActive;
+
   categoryWrap.hidden = isKs && state.sampleSize !== 100;
 }
 
@@ -307,10 +424,11 @@ function renderTable(root, data) {
   const models = sortModels(filterModels(data), data);
   const ranked = models.filter(m => getScore(m) !== null);
 
-  scoreHeader.textContent = getSortLabel();
+  scoreHeader.textContent = getSortLabel(data);
   scoreHeader.dataset.sort = 'score';
   countEl.textContent = `${models.length} model${models.length !== 1 ? 's' : ''}`;
-  updateProfileHint(root);
+  updateProfileHeader(root, data);
+  updateProfileHint(root, data);
 
   tbody.innerHTML = models.map(model => {
     const score = getScore(model);
@@ -320,16 +438,26 @@ function renderTable(root, data) {
     const rankClass = rank === 1 ? 'rank-gold' : rank === 2 ? 'rank-silver' : rank === 3 ? 'rank-bronze' : '';
     const familyColor = FAMILY_COLORS[model.family] || '#888';
 
-    return `<tr>
+    const variantClass = model.variant === 'base' ? 'lb-variant-base' : '';
+    const variantBadge = model.variant === 'base'
+      ? '<span class="lb-variant-badge lb-variant-badge-base">Base</span>'
+      : '';
+    const scopeBadge = model.evalScopeLabel
+      ? `<span class="lb-scope-badge" title="Evaluated on ${model.evalScopeLabel} (excludes Shuffling and Real-World)">${model.evalScopeLabel}</span>`
+      : '';
+
+    return `<tr class="${variantClass}${model.evalScope ? ' lb-scope-row' : ''}">
       <td class="lb-rank ${rankClass}">${rank}</td>
       <td class="lb-model">
         <span class="lb-model-name">
           <span class="model-dot" style="background:${familyColor}" title="${model.family}"></span>
           ${model.name}
+          ${variantBadge}
+          ${scopeBadge}
         </span>
       </td>
       <td class="lb-profile">${renderProfile(model, data)}</td>
-      <td class="lb-score" style="background: ${bg}">
+      <td class="lb-score${score === null ? ' lb-score-missing' : ''}" style="background: ${bg}" title="${getScoreTitle(model, score)}">
         <div class="score-cell">
           <span class="score-value">${formatScore(score)}</span>
           <span class="score-meter"><span class="score-meter-fill" style="width: ${intensity * 100}%"></span></span>
